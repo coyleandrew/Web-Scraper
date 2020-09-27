@@ -1,14 +1,24 @@
 require 'net/http'
 
 module HttpClient
-
-    def HttpGet url
+    def HttpsGet(url)
         uri = URI(url)
+        r = Net::HTTP::Get.new uri
+        yield(r) if block_given?
 
-        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-            request = Net::HTTP::Get.new uri
-            response = http.request request
-            return response.body
+        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |c|
+            return c.request r
+        end
+
+    end
+
+    def HttpsPost(url)
+        uri = URI(url)
+        r = Net::HTTP::Post.new uri
+        yield(r) if block_given?
+
+        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |c|
+            return c.request r
         end
     end
 end

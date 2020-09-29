@@ -1,10 +1,12 @@
 load 'httpclient.rb'
 load 'item.rb'
+load 'scraperesult.rb'
 require 'nokogiri'
 
 class NetNutritionClient
   include HttpClient
   BASE_URL = "https://dining.osu.edu/NetNutrition"
+  UNITS_URL = "/1/Unit/SelectUnitFromTree"
 
   def initialize
     response = HttpsGet NetNutritionClient::BASE_URL
@@ -13,22 +15,63 @@ class NetNutritionClient
     @cookies = response['set-cookie']
   end
 
-  def sample
-    # we know where 1 menu is
-    result = post "https://dining.osu.edu/NetNutrition/1/Unit/SelectUnitFromTree", 'unitOid' => 1
+  def scrape
+    # get the home page, this has all the top level locations
+    home = get "#{BASE_URL}/1"
+
+    # load the page into nokogiri
+    doc = Nokogiri::HTML(home.body)
+
+    locations_html = doc.css(".cbo_nn_unitTreeListDiv a").map { |a| a.attr("onclick") }
+    locationIds = locations_html.map { |l| /\d+/.match(l).to_s }
+
+    locations = Array.new
+    # Locations only have one level of children. A nested loop will suffice
+    locationIds.each.with_index do |id, i|
+      puts "Scraping category #{i+1} of #{locationIds.length}"
+      result = scrape_unit id
+      locations.push result
+      result.children.each { |id| locations.push scrape_unit id }
+    end
+
+    # flatten the data
+    items = locations.collect { |l| l.items.map { |item| Item.new item, l.name, l.lat, l.long } }
+    return  items.flatten
+  end
+
+  def scrape_unit(id)
+    # post for the unit data
+    result = post "https://dining.osu.edu/NetNutrition/1/Unit/SelectUnitFromTree", 'unitOid' => id
 
     # results are json with HTML content
     json = JSON.parse(result.body)
     menu_html = json["panels"][0]["html"]
+    children_html = json["panels"][2]["html"]
 
-    # load it into nokogiri
+    # load location menu it into nokogiri
     doc = Nokogiri::HTML(menu_html)
 
-    # select item elements
-    items_html = doc.css('.cbo_nn_itemPrimaryRow td[tabindex="0"]')
+    # select location name
+    locationName = doc.css(".cbo_nn_itemHeaderDiv").text
 
-    # return simple array of items
-    items_html.map { |e| Item.new e.text, 39.996782, -83.013649 }
+    # select item elements
+    items_html = doc.css(".cbo_nn_itemPrimaryRow td[tabindex=\"0\"]")
+
+    # map item elements to item text
+    items = items_html.map(&:text)
+
+    # collect the child locations
+    doc = Nokogiri::HTML(children_html)
+
+    # select child locations
+    locations_onclick = doc.css(".cbo_nn_unitNameLink")
+    locations_onclick_text = locations_onclick.map { |a| a.attr("onclick") }
+
+    # match just the ids
+    locations = locations_onclick_text.map { |l| /\d+/.match(l).to_s } if locations_onclick
+
+    #TODO: lat/long lookup
+    ScrapeResult.new locationName, id, items, locations, 0, 0
   end
 
   def get(url)

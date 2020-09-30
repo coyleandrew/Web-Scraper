@@ -1,10 +1,13 @@
 load 'httpclient.rb'
 load 'item.rb'
 load 'scraperesult.rb'
+load 'auxiliary.rb'
 require 'nokogiri'
+require 'geocoder'
 
 class NetNutritionClient
   include HttpClient
+  include Location
   BASE_URL = "https://dining.osu.edu/NetNutrition"
   UNITS_URL = "/1/Unit/SelectUnitFromTree"
 
@@ -70,7 +73,12 @@ class NetNutritionClient
     # match just the ids
     locations = locations_onclick_text.map { |l| /\d+/.match(l).to_s } if locations_onclick
 
-    #TODO: lat/long lookup
+    # get location address from location name
+    locationAddress = retrieve_add(locationName)
+
+    # calculate lat/lon from address
+    latLon = Geocoder.coordinates(locationAddress)
+
     ScrapeResult.new locationName, id, items, locations, 0, 0
   end
 

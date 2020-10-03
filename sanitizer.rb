@@ -1,0 +1,4 @@
+
+class Sanitizer
+
+end

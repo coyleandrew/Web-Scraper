@@ -79,7 +79,12 @@ class NetNutritionClient
     # calculate lat/lon from address
     latLon = Geocoder.coordinates(locationAddress)
 
-    ScrapeResult.new locationName, id, items, locations, 0, 0
+    if locationAddress
+      lat = latLon[0]
+      long = latLon[1]
+    end
+
+    ScrapeResult.new locationName, id, items, locations, lat, long
   end
 
   def get(url)

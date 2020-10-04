@@ -7,7 +7,10 @@ class Sanitizer
 
   def uniqueDuplicate(groupArray)
     groupArray.length.time do |i|
-      uniqueDuplicate = groupArray.index[i].unique(&name);
+      uniqueDuplicate = groupArray[i].values;
+      uniqueDuplicate.length.time do|k|
+        uniqueDuplicate.unique(&name);
+      end
     end
     return uniqueDuplictae;
   end

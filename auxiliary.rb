@@ -1,5 +1,8 @@
+
 module Location
+
     def retrieve_add(locationName)
+        # given the name of a dining location, returns its address
         case locationName
         when "12th Avenue Bread Co."
             "251 W. 12th Ave, Columbus, OH"
@@ -53,7 +56,19 @@ module Location
             "1739 North High Street, Columbus, OH"
         when "Ohio Union Operations -  Woody's Tavern"
             "1739 North High Street, Columbus, OH"
-        #TODO: Moco Fusion, Newark, Mansfield, Wooster, Foodtruck 1.0 and 2.0
+        when "Foodtruck 1.0" || "Foodtruck 2.0"
+            "1958 Neil Ave, Columbus, OH"
+        when "Newark"
+            "1179 University Dr, Newark, OH"
+        when "Mansfield"
+            "1760 University Dr, Mansfield, OH"
+        when "Wooster"
+            "1889 Garrison Cir E Wooster, OH"
+        when "Moco Fusion"
+            "1900 Cannon Drive Columbus, OH"
+        else
+            # an invalid location was passed
+            raise "Invalid location"
         end
     end
 end

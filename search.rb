@@ -2,69 +2,47 @@
 
 # search the desired item and return the closest location
 class Search
-  load 'item.rb'
   require 'geocoder'
-  load 'sanitizer.rb'
   load 'items_db.rb'
   include ItemsDb
-  attr_reader :set
-
-  def initialize(sets = [])
-    @sets = sets
-  end
 
   def main
-    # Get name of item from user
-    puts 'How can I help you? '
-    name = gets
+    # Get the search text
+    puts 'Enter a food item to search for? '
+    search = gets.chomp 
 
     # Get users current address
     puts 'Enter your address: '
-    address = gets
-    min = 2**30
-    #if ture_false(name) -----> Commented out for testing
+    address = gets.chomp 
 
-    puts load_items("items.csv").find {|item| item.name.include? name }
-    if false
-      location = find(address, min)
-      puts 'The nearest location is ' + location
+    # Geocode the user address
+    # TODO: Retry for invalid addresses
+    loc = user_location(address)
+
+    # all items that match the search text
+    # TODO: fuzzy matching, "tacos" has no results, but "taco" does.
+    matches = load_items("items.csv").find_all {|item| item.name.downcase.include? search.downcase }
+
+    # take the minimum distance item, in the case of a tie, min_by will return the first.
+    closest = matches.min_by { |item| distance(loc, [item.lat, item.long]) }
+
+    # report results
+    if closest
+      miles = distance(loc, [closest.lat, closest.long])
+      puts "We found \"#{closest.name}\" at \"#{closest.location}\", #{miles.round(2)} miles away."
     else
-      puts 'Cannot find ' + name
+      puts "Could not find any items matching \"#{search}\""
     end
+    puts "done"
   end
 
-  def ture_false(name)
-    result = groupLocation(item)
-    if result.value?(name)
-      @set << result.index(name)
-      true
-    else
-      false
-    end
+  # convert address string to geocode
+  def user_location(address)
+    Geocoder.coordinates(address)
   end
 
-  def find(user, min)
-    @sets.each do |locate|
-      if distance(user, locate) < min
-        min = distance(user, locate)
-        location = locate
-      end
-    end
-    location
-  end
-
-  def get_location(location)
-    location_address = retrieve_add(location)
-    lat_lon = Geocoder.coordinates(location_address)
-    lat_lon
-  end
-
-  def user_location(user)
-    lat_lon = Geocoder.coordinates(user)
-    lat_lon
-  end
-
-  def distance(user, location)
-    Geocoder::Calculations.distance_between([user_location(user)], [get_location(location)])
+  # compute the distance betweeen two geocode locations
+  def distance(a, b)
+    Geocoder::Calculations.distance_between(a, b)
   end
 end

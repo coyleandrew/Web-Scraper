@@ -22,16 +22,12 @@ test_items = NetNutritionClient.new
 test_db = TestItemsDb.new
 
 # scrape everything
-#items = test_items.scrape
+items = test_items.scrape
 # save items
-#test_db.test_save "items.csv", items
+test_db.test_save "items.csv", items
 # verify saved
 puts "Test Save: #{ File.exists?("items.csv") }"
 
 # test load
 load_items = test_db.test_load("items.csv")
-##puts "Test Load: #{ load_items.length == items.length }"
-
-name = "Latte"
-latte = load_items.find {|item| item.name.include? name}
-puts latte
+puts "Test Load: #{ load_items.length == items.length }"

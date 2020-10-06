@@ -21,16 +21,33 @@ class Main
     def run
         case @command
         when "update"
-            items = @menuClient.scrape
-            self.save_items("./items.csv", items)
+            puts "Updating database"
+            update_database
         when "search"
+            # Make sure the database exists
+            ensure_database
             @search.do_search(@args[0], @args[1])
         when ""
+            # Make sure the database exists
+            ensure_database
             @search.main
         else
             puts "Invalid command, please try again."
         end
 
+    end
+
+    # Restore the database in case it goes missing.
+    def ensure_database
+        unless File.exist?("./items.csv")
+            puts "Restoring items database."
+            update_database
+        end
+    end
+
+    def update_database
+        items = @menuClient.scrape
+            self.save_items("./items.csv", items)
     end
 
 end

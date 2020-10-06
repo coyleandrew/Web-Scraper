@@ -1,18 +1,20 @@
 # Team-Three-Project-3
-Find the nearest dining.osu.edu menu item.
+Find the nearest [Dining](https://dining.osu.edu/NetNutrition) menu item.
 
 ## Background
-Dining services provides for a number locations around campus with diverse offerings 
-but lacks a centralized search. Finding the nearest dining service that offers Tacos
+Dining services offers for a number locations around campus with diverse offerings 
+but lacks a centralized search. For example, finding the nearest dining service that offers Tacos
 is non trivial.
 
 ## Installation
 In a terminal, enter the following commands
+
+Download the searvice.
 ```
 git clone https://github.com/cse3901-2020au-11163/Team-Three-Project-3.git
 cd Team-Three-Project-3
 ```
-Install dependencies
+Install dependencies.
 ```
 bundle install
 ```
@@ -23,13 +25,13 @@ Team-Three-Project-3 provides two modes of use. An interactive terminal and a CL
 ### Interactive Terminal
 A guided experience.
 ```
-bundle exec main.rb
+ruby main.rb
 ```
-
 ### CLI
 
 Use the following commands to use the Team-Three-Project-3 service.
-- Update the items database
+
+- Update the item's database.
 ```
 ruby main.rb update
 ```
@@ -38,10 +40,14 @@ ruby main.rb update
 ruby main.rb search 'your-address' 'search-text'
 ```
 
+### Address
+A quick note about location. Your address is required to determine your location for the purpose of calculating distances. Many address strings
+are acceptable, the easiest being a simple 5 digit zip code.
+
+
 ## Contributing
-The search service is composed of 4 phases.
+The search service is composed of 3 phases.
  
  1. Scrape: NetNutritionClient will extract menu items and locations from https://dining.osu.edu/NetNutrition into an array of type Items[]
- 2. Clean: Sanitize will remove duplicates and extraneous item descriptions not relevant to searching. (e.g. item sizes) 
- 3. Save: Save cleaned list of items to a CSV to improve searching experience.
+ 3. Save: Save list of items to a CSV to improve searching experience.
  4. Search: Find search text matches and offer the nearest result.

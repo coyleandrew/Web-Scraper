@@ -55,7 +55,6 @@ class Search
       else
         puts "Could not find any items matching \"#{search}\""
       end
-      puts "done"
     end
   end
 

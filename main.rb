@@ -1,7 +1,6 @@
 command, *args = ARGV
 
 load 'search.rb'
-load 'sanitizer.rb'
 load 'netnutritionclient.rb'
 
 class Main
@@ -16,7 +15,6 @@ class Main
         # create services
         @menuClient = NetNutritionClient.new
         @search = Search.new
-        @sanitizer = Sanitizer.new
     end
 
     # Determine what to do

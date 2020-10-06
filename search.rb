@@ -3,6 +3,7 @@
 # search the desired item and return the closest location
 class Search
   require 'geocoder'
+  require 'fuzzy_match'
   load 'items_db.rb'
   include ItemsDb
 
@@ -16,24 +17,41 @@ class Search
     address = gets.chomp 
 
     # Geocode the user address
-    # TODO: Retry for invalid addresses
     loc = user_location(address)
-
-    # all items that match the search text
-    # TODO: fuzzy matching, "tacos" has no results, but "taco" does.
-    matches = load_items("items.csv").find_all {|item| item.name.downcase.include? search.downcase }
-
-    # take the minimum distance item, in the case of a tie, min_by will return the first.
-    closest = matches.min_by { |item| distance(loc, [item.lat, item.long]) }
-
-    # report results
-    if closest
-      miles = distance(loc, [closest.lat, closest.long])
-      puts "We found \"#{closest.name}\" at \"#{closest.location}\", #{miles.round(2)} miles away."
-    else
-      puts "Could not find any items matching \"#{search}\""
+    while loc == nil && address != "q"
+      puts "Invalid address. Please enter a new address or press 'q' to quit:"
+      address = gets.chomp
+      loc = user_location(address)
     end
-    puts "done"
+
+    if address != "q"
+      # Load all items into array
+      item_list = load_items("items.csv")
+
+      # name_list will contain item.name for all items
+      name_list = []
+
+      # Gather all the item.names and place into name_list
+      item_list.each {|item| name_list.push(item.name)}
+
+      # Find closest matched item that user enters
+      user_item = FuzzyMatch.new(name_list).find(search)
+
+      # Find all items that match user input
+      matches = item_list.find_all {|item| item.name.downcase.include? user_item.downcase }
+
+      # take the minimum distance item, in the case of a tie, min_by will return the first.
+      closest = matches.min_by { |item| distance(loc, [item.lat, item.long]) }
+
+      # report results
+      if closest
+        miles = distance(loc, [closest.lat, closest.long])
+        puts "We found \"#{closest.name}\" at \"#{closest.location}\", #{miles.round(2)} miles away."
+      else
+        puts "Could not find any items matching \"#{search}\""
+      end
+      puts "done"
+    end
   end
 
   # convert address string to geocode

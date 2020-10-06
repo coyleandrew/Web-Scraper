@@ -30,7 +30,7 @@ class NetNutritionClient
 
     locations = Array.new
     # Locations only have one level of children. A nested loop will suffice
-    locationIds.take(4).each.with_index do |id, i|
+    locationIds.each.with_index do |id, i|
       puts "Scraping category #{i+1} of #{locationIds.length}"
       result = scrape_unit id
       locations.push result
@@ -54,8 +54,8 @@ class NetNutritionClient
     # load location menu it into nokogiri
     doc = Nokogiri::HTML(menu_html)
 
-    # select location name
-    locationName = doc.css(".cbo_nn_itemHeaderDiv").text
+    # select location name, watch out for unicode NBSP, gsub may look like replace space with space, it's not.
+    locationName = doc.css(".cbo_nn_itemHeaderDiv").text.gsub(" ", " ")
 
     # select item elements
     items_html = doc.css(".cbo_nn_itemPrimaryRow td[tabindex=\"0\"]")

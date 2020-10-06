@@ -14,8 +14,13 @@ class Search
 
     # Get users current address
     puts 'Enter your address: '
-    address = gets.chomp 
+    address = gets.chomp
 
+    # do the search
+    self.do_search(address, search)
+  end
+
+  def do_search(address, search)
     # Geocode the user address
     loc = user_location(address)
     while loc == nil && address != "q"

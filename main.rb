@@ -23,14 +23,14 @@ class Main
     def run
         case @command
         when "update"
-            puts "Do upading database."
+            items = @menuClient.scrape
+            self.save_items("./items.csv", items)
         when "search"
-            puts "Do args version of search"
-        else
-            puts "Do check for database file"
-
-            # init interactive search
+            @search.do_search(@args[0], @args[1])
+        when ""
             @search.main
+        else
+            puts "Invalid command, please try again."
         end
 
     end

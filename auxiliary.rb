@@ -69,8 +69,8 @@ module Location
         when "Moco Fusion"
             "1900 Cannon Drive Columbus, OH"
         else
-            # an invalid location was passed
-            raise "Invalid location"
+            # Just return nil to prevent new locations from tanking the whole thing
+            nil
         end
     end
 end

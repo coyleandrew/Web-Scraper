@@ -30,7 +30,7 @@ class NetNutritionClient
 
     locations = Array.new
     # Locations only have one level of children. A nested loop will suffice
-    locationIds.each.with_index do |id, i|
+    locationIds.take(4).each.with_index do |id, i|
       puts "Scraping category #{i+1} of #{locationIds.length}"
       result = scrape_unit id
       locations.push result

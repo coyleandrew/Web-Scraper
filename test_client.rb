@@ -24,4 +24,4 @@ puts "Test Scrape Unit With Children: #{ unit.children.any? { |c| c == "6"} }"
 
 # Test the big one, scrapes everything
 all = test.scrape
-puts "Test Scrape: #{ all.length == 4221 }"
+puts "Test Scrape: #{ all.length > 1000 }"

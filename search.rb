@@ -5,6 +5,8 @@ class Search
   load 'item.rb'
   require 'geocoder'
   load 'sanitizer.rb'
+  load 'items_db.rb'
+  include ItemsDb
   attr_reader :set
 
   def initialize(sets = [])
@@ -12,13 +14,19 @@ class Search
   end
 
   def main
+    # Get name of item from user
     puts 'How can I help you? '
     name = gets
+
+    # Get users current address
     puts 'Enter your address: '
-    user = gets
+    address = gets
     min = 2**30
-    if ture_false(name)
-      location = find(user, min)
+    #if ture_false(name) -----> Commented out for testing
+
+    puts load_items("items.csv").find {|item| item.name.include? name }
+    if false
+      location = find(address, min)
       puts 'The nearest location is ' + location
     else
       puts 'Cannot find ' + name
